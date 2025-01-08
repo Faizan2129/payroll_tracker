@@ -1,0 +1,85 @@
+include header
+
+style.
+  body {
+    padding: 0;
+    margin: 0;
+    font-family: "Arial", sans-serif;
+    background: #e3f2fd; /* Light blue background */
+    color: #1a237e; /* Deep blue text */
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card {
+    background: #ffcc80; /* Light orange card */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    border-radius: 8px;
+    width: 320px;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #4e342e; /* Brown heading */
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #1b5e20; /* Green labels */
+  }
+
+  input {
+    padding: 12px;
+    border: 1px solid #8e24aa; /* Purple border */
+    border-radius: 5px;
+  }
+
+  input[type="submit"] {
+    background: #1e88e5; /* Bright blue button */
+    color: #ffffff; /* White text */
+    border: none;
+    transition: background 0.3s ease;
+  }
+
+  input[type="submit"]:hover {
+    background: #1565c0; /* Darker blue on hover */
+  }
+
+  p {
+    text-align: center;
+    margin-top: 20px;
+    color: #37474f; /* Gray text */
+  }
+
+  a {
+    color: #d84315; /* Orange link */
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: #bf360c; /* Darker orange on hover */
+  }
+
+.card
+  h1 Login
+  form(action="/authenticate" method="POST")
+    label(for="email") Email Address:
+    input(type="email" id="email" name="email" required)
+    label(for="password") Password:
+    input(type="password" id="password" name="password" required)
+    p(style="color: #e53935;") #{errorMessage || ''}
+    input(type="submit" value="Sign In")
+  p Not a member yet? 
+    a(href="/register") Register here.

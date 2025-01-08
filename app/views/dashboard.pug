@@ -1,0 +1,79 @@
+doctype html
+html
+  head
+    title Payroll Dashboard
+    style.
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+
+      .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        padding: 20px 0;
+      }
+
+      .cards {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 30px;
+      }
+
+      .card {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 200px;
+        margin: 10px;
+      }
+
+      .card h3 {
+        margin: 10px 0;
+        color: #333;
+      }
+
+      .card p {
+        font-size: 1.5rem;
+        color: #4CAF50;
+        font-weight: bold;
+      }
+
+      .message {
+        text-align: center;
+        font-size: 1.5rem;
+        color: #f44336;
+      }
+    
+  body
+    .container
+      h1 Payroll Dashboard
+
+      // Display message if no records are found
+      if errorMessage
+        p.message= errorMessage
+
+      // Cards for Daily, Monthly, Yearly, Total sums
+      .cards
+        .card
+          h3 Daily
+          p= today + ' / $' + today
+        .card
+          h3 Monthly
+          p= monthly + ' / $' + monthly
+        .card
+          h3 Yearly
+          p= yearly + ' / $' + yearly
+        .card
+          h3 Total
+          p= total + ' / $' + total

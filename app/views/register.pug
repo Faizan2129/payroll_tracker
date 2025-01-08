@@ -1,0 +1,103 @@
+include header
+
+style.
+  body {
+    padding: 0;
+    margin: 0;
+    font-family: "Arial", sans-serif;
+    background: #e3f2fd; /* Light blue background */
+    color: #1a237e; /* Deep blue text */
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card {
+    background-color: #ffcc80; /* Light orange card */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    border-radius: 8px;
+    width: 320px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #4e342e; /* Brown heading */
+    margin-bottom: 20px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #1b5e20; /* Green labels */
+  }
+
+  input {
+    padding: 12px;
+    border: 1px solid #8e24aa; /* Purple border */
+    border-radius: 5px;
+  }
+
+  input[type="submit"] {
+    background-color: #1e88e5; /* Bright blue button */
+    color: #ffffff; /* White text */
+    border: none;
+    transition: background 0.3s ease;
+    cursor: pointer;
+  }
+
+  input[type="submit"]:hover {
+    background-color: #1565c0; /* Darker blue on hover */
+  }
+
+  p.success,
+  p.error {
+    margin-top: 15px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .success {
+    color: #1b5e20; /* Green for success messages */
+  }
+
+  .error {
+    color: #e53935; /* Bright red for error messages */
+  }
+
+  a {
+    color: #d84315; /* Orange link */
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: #bf360c; /* Darker orange on hover */
+  }
+
+block content
+  .card
+    h1 Register here
+    form(action="/set-password" method="POST")
+      label(for="email") Enter your email:
+      input(type="email" id="email" name="email" required)
+      label(for="password") Enter your password:
+      input(type="password" id="password" name="password" required)
+      input(type="submit" value="Submit")
+      p Already have an account?
+        a(href="/login") Login here.
+
+      // Success message
+      if successMessage
+        p.success= successMessage
+
+      // Error message
+      if errorMessage
+        p.error= errorMessage
