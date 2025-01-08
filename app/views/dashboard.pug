@@ -55,8 +55,38 @@ html
         color: #f44336;
       }
 
+      .actions {
+        display: flex;
+        gap: 5px;
+      }
+
+      .btn {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+        font-size: 0.9rem;
+        text-decoration: none;
+        text-align: center;
+      }
+
+      .btn-create {
+        background-color: #007BFF;
+        margin-bottom: 10px;
+        display: inline-block;
+      }
+
+      .btn-edit {
+        background-color: #FFC107;
+      }
+
+      .btn-delete {
+        background-color: #DC3545;
+      }
+
       .payroll-table {
-        margin-top: 50px;
+        margin-top: 20px;
         background-color: #fff;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -82,6 +112,7 @@ html
       table tr:hover {
         background-color: #f1f1f1;
       }
+      
 
   body
     include header1
@@ -96,19 +127,22 @@ html
       .cards
         .card
           h3 Daily
-          p= today + ' / $' + today
+          p= '£' + today
         .card
           h3 Monthly
-          p= monthly + ' / $' + monthly
+          p= '£' + monthly
         .card
           h3 Yearly
-          p= yearly + ' / $' + yearly
+          p= '£' + yearly
         .card
           h3 Total
-          p= total + ' / $' + total
+          p= '£' + total
+
+      // Create button
+      a.btn.btn-create(href="/create") Create New Payroll Record
 
       // Table for payroll records
-      if payroll_records.length
+      if Array.isArray(payroll_records) && payroll_records.length
         .payroll-table
           table
             thead
@@ -123,6 +157,7 @@ html
                 th Total Pay
                 th Work Date
                 th Status
+                th Actions
             tbody
               each record in payroll_records
                 tr
@@ -130,11 +165,17 @@ html
                   td= record.user_id
                   td= record.company
                   td= record.hours_worked
-                  td= '$' + record.hourly_rate
+                  td= '£' + record.hourly_rate
                   td= record.overtime_hours
-                  td= record.overtime_rate
-                  td= '$' + record.total_pay
+                  td= '£' + record.overtime_rate
+                  td= '£' + record.total_pay
                   td= new Date(record.work_date).toLocaleDateString()
                   td= record.status
+                  td
+                    .actions
+                      a.btn.btn-edit(href=`/update/${record.id}`) Edit
+                      form(action=`/payroll/delete/${record.id}` method="POST" style="display:inline")
+                        input(type="hidden" name="_method" value="DELETE")
+                        button(type="submit" class="btn btn-delete") Delete
       else
         p.message No payroll records found.

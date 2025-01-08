@@ -79,6 +79,39 @@ app.get('/login', (req, res) => {
     res.render('login', { loggedIn: req.session.loggedIn, currentPage: 'login' });
 });
 
+
+app.get('/update/:id', async (req, res) => {
+    try {
+        const payrollId = req.params.id;
+        const sql = 'SELECT * FROM payroll WHERE id = ?';
+        const [payroll] = await db.query(sql, [payrollId]);
+
+        if (!payroll || payroll.length === 0) {
+            return res.status(404).send('Payroll record not found');
+        }
+
+        console.log(payroll);
+        res.render('update', {
+            id: payroll.id,
+            user_id: payroll.user_id,
+            company: payroll.company,
+            hours_worked: payroll.hours_worked,
+            hourly_rate: payroll.hourly_rate,
+            overtime_hours: payroll.overtime_hours,
+            overtime_rate: payroll.overtime_rate,
+            work_date: new Date(payroll.work_date).toISOString().slice(0, 16)
+          });
+    } catch (error) {
+        console.error('Error fetching payroll:', error);
+        res.status(500).send('Error fetching payroll');
+    }
+});
+
+
+app.get('/create', (req, res) => {
+    res.render('create', { loggedIn: req.session.loggedIn, currentPage: 'create' });
+});
+
 app.get('/profile', async (req, res) => {
     try {
         if (!req.session.uid) {
@@ -148,6 +181,57 @@ app.post('/authenticate', async (req, res) => {
         }
     } catch (err) {
         console.error(`Error while comparing `, err.message);
+    }
+});
+
+app.post('/payroll/create', async (req, res) => {
+    // const userId = req.session.uid;
+    try {
+        const { user_id, company, hours_worked, hourly_rate, overtime_hours, overtime_rate, work_date } = req.body;
+
+        // SQL query to insert a new payroll record without total_pay (it will be calculated automatically)
+        const sql = `INSERT INTO payroll (user_id, company, hours_worked, hourly_rate, overtime_hours, overtime_rate, work_date)
+                     VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+        await db.query(sql, [user_id, company, hours_worked, hourly_rate, overtime_hours, overtime_rate, work_date]);
+
+        res.redirect('/dashboard'); // Redirect to dashboard or show a success message
+    } catch (error) {
+        console.error("Error creating payroll:", error);
+        res.render('create-payroll', { errorMessage: 'Error creating payroll record.' });
+    }
+});
+
+
+app.post('/payroll/update/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { hours_worked, hourly_rate, overtime_hours, overtime_rate, work_date } = req.body;
+        console.log(req.body);
+
+        // Remove total_pay from the SQL update since it's calculated by the database
+        const sql = 'UPDATE payroll SET hours_worked = ?, hourly_rate = ?, overtime_hours = ?, overtime_rate = ?, work_date = ? WHERE id = ?';
+        await db.query(sql, [hours_worked, hourly_rate, overtime_hours, overtime_rate, work_date, id]);
+
+        res.redirect('/dashboard'); // Redirect back to dashboard after updating the payroll
+    } catch (error) {
+        console.error("Error updating payroll:", error.message);
+        res.render('dashboard', { errorMessage: 'An error occurred while updating payroll.' });
+    }
+});
+
+
+app.post('/payroll/delete/:id', async (req, res) => {
+    try {
+        const { id } = req.params; 
+
+        const sql = 'DELETE FROM payroll WHERE id = ?';
+        await db.query(sql, [id]);
+
+        res.redirect('/dashboard');
+    } catch (error) {
+        console.error("Error deleting payroll:", error.message);
+        res.render('dashboard', { errorMessage: 'An error occurred while deleting payroll.' });
     }
 });
 

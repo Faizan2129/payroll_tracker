@@ -1,0 +1,114 @@
+doctype html
+html
+  head
+    title Create Payroll Record
+    style.
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+
+      .container {
+        width: 90%;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        padding: 20px 0;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      label {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #555;
+      }
+
+      input[type="number"],
+      input[type="text"],
+      input[type="datetime-local"] {
+        padding: 8px;
+        margin-top: 5px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+        width: 100%;
+      }
+
+      button[type="submit"] {
+        padding: 10px;
+        font-size: 1rem;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      button[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+
+      .message {
+        text-align: center;
+        font-size: 1.5rem;
+        color: #f44336;
+      }
+
+  body
+    include header1
+    .container
+      h1 Create Payroll Record
+      // Display error or success message if any
+      if errorMessage
+        p.message= errorMessage
+      if successMessage
+        p.message= successMessage
+
+      form(action="/payroll/create" method="POST")
+        div
+          label(for="user_id") User ID:
+          input(type="number" id="user_id" name="user_id" required)
+
+        div
+          label(for="company") Company:
+          input(type="text" id="company" name="company" required)
+
+        div
+          label(for="hours_worked") Hours Worked:
+          input(type="number" step="0.01" id="hours_worked" name="hours_worked" required)
+
+        div
+          label(for="hourly_rate") Hourly Rate:
+          input(type="number" step="0.01" id="hourly_rate" name="hourly_rate" required)
+
+        div
+          label(for="overtime_hours") Overtime Hours:
+          input(type="number" step="0.01" id="overtime_hours" name="overtime_hours" value="0" required)
+
+        div
+          label(for="overtime_rate") Overtime Rate (Default 1.5):
+          input(type="number" step="0.01" id="overtime_rate" name="overtime_rate" value="1.5" required)
+
+        div
+          label(for="work_date") Work Date:
+          input(type="datetime-local" id="work_date" name="work_date" required)
+
+        div
+          button(type="submit") Create Payroll Record
