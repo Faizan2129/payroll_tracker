@@ -1,4 +1,3 @@
-// Get the functions in the db.js file to use
 const db = require('../services/db');
 const bcrypt = require("bcryptjs");
 
@@ -18,30 +17,26 @@ class User {
     async getIdFromEmail()  {
         let sql = "SELECT id FROM Users WHERE Users.email = ?";
         const result = await db.query(sql, [this.email]);
-        // TODO LOTS OF ERROR CHECKS HERE..
-        if (JSON.stringify(result) != '[]') {
+        if (result.length > 0) {
             this.id = result[0].id;
             return this.id;
         }
-        else {
-            return false;
-        }
+        return false;
     }
 
     // Add a password to an existing user
     async setUserPassword(password) {
         const pw = await bcrypt.hash(password, 10);
-        let sql = "UPDATE Users SET password = ? WHERE Users.id = ?"
-        const result = await db.query(sql, [pw, this.id]);
+        let sql = "UPDATE Users SET password = ? WHERE Users.id = ?";
+        await db.query(sql, [pw, this.id]);
         return true;
     }
     
     // Add a new record to the users table    
     async addUser(password) {
         const pw = await bcrypt.hash(password, 10);
-        let sql = "INSERT INTO Users (email, password) VALUES (? , ?)";
+        let sql = "INSERT INTO Users (email, password) VALUES (?, ?)";
         const result = await db.query(sql, [this.email, pw]);
-        console.log(result.insertId);
         this.id = result.insertId;
         return this.id;
     }
@@ -50,20 +45,23 @@ class User {
     async authenticate(submitted) {
         let sql = "SELECT password FROM Users WHERE id = ?";
         const result = await db.query(sql, [this.id]);
-        console.log(result[0].password)
         const match = await bcrypt.compare(submitted, result[0].password);
-        console.log(match)
-        if (match == true) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return match;
     }
 
-
+    // Retrieve a user by their ID
+    static async findById(id) {
+        const sql = "SELECT id, email FROM Users WHERE id = ?";
+        const result = await db.query(sql, [id]);
+        if (result.length > 0) {
+            const user = new User(result[0].email);
+            user.id = result[0].id;
+            return user;
+        }
+        return null; // User not found
+    }
 }
 
-module.exports  = {
+module.exports = {
     User
-}
+};

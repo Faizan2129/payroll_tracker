@@ -26,50 +26,52 @@ app.get('/register', (req, res) => {
     res.render('register');
 });
 app.get('/home', (req, res) => {
-    res.render('home');
+    res.render('home',{currentPage: 'home'});
 });
 
 
 
 app.get("/dashboard", async function (req, res) {
     try {
-        const userId = 1; // Replace with user session or auth ID
-        
-        // Fetch payroll records for the user
-        const payrollRecords = await Payroll.getPayrollByUser(userId);
+        // // Ensure the user is logged in
+        // if (!req.session.uid) {
+        //     return res.redirect("/login");
+        // }
+        const userId = req.session.uid || 1;
 
-        // SQL queries for daily, monthly, yearly, and total amount sums
-        const sql1 = 'SELECT SUM(Amount) AS TotalAmountToday FROM payroll WHERE selecteddate = CURDATE()';
-        const sql2 = 'SELECT SUM(Amount) AS TotalAmountThisMonth FROM payroll WHERE YEAR(selecteddate) = YEAR(CURDATE()) AND MONTH(selecteddate) = MONTH(CURDATE())';
-        const sql3 = 'SELECT SUM(Amount) AS TotalAmountThisYear FROM payroll WHERE YEAR(selecteddate) = YEAR(CURDATE())';
-        const sql4 = 'SELECT SUM(Amount) AS TotalAmount FROM payroll';
+        // SQL queries for payroll summary and user-specific records
+        const sql1 = 'SELECT SUM(total_pay) AS TotalAmountToday FROM payroll WHERE DATE(work_date) = CURDATE() AND user_id = ?';
+        const sql2 = 'SELECT SUM(total_pay) AS TotalAmountThisMonth FROM payroll WHERE YEAR(work_date) = YEAR(CURDATE()) AND MONTH(work_date) = MONTH(CURDATE()) AND user_id = ?';
+        const sql3 = 'SELECT SUM(total_pay) AS TotalAmountThisYear FROM payroll WHERE YEAR(work_date) = YEAR(CURDATE()) AND user_id = ?';
+        const sql4 = 'SELECT SUM(total_pay) AS TotalAmount FROM payroll WHERE user_id = ?';
+        const sql5 = 'SELECT * FROM payroll WHERE user_id = ?';
 
-        // Execute all SQL queries concurrently
-        const [results1, results2, results3, results4] = await Promise.all([
-            db.query(sql1),
-            db.query(sql2),
-            db.query(sql3),
-            db.query(sql4)
+        // Execute queries concurrently with user-specific parameter
+        const [results1, results2, results3, results4, results5] = await Promise.all([
+            db.query(sql1, [userId]),
+            db.query(sql2, [userId]),
+            db.query(sql3, [userId]),
+            db.query(sql4, [userId]),
+            db.query(sql5, [userId])
         ]);
 
         // Render the dashboard page with the results
         res.render("dashboard", {
-            payrollRecords: payrollRecords,
-            today: results1[0].TotalAmountToday || 0,
-            monthly: results2[0].TotalAmountThisMonth || 0,
-            yearly: results3[0].TotalAmountThisYear || 0,
-            total: results4[0].TotalAmount || 0
+            today: results1[0]?.TotalAmountToday || 0,
+            monthly: results2[0]?.TotalAmountThisMonth || 0,
+            yearly: results3[0]?.TotalAmountThisYear || 0,
+            total: results4[0]?.TotalAmount || 0,
+            payroll_records: results5 || [],
+            loggedIn: req.session.loggedIn,
+            currentPage: 'dashboard',
         });
     } catch (error) {
-        console.error(`Error while fetching payroll records:`, error.message);
-        res.render("dashboard", { errorMessage: 'Error fetching payroll records' });
+        console.error("Error while fetching payroll records:", error.message);
+        res.render("dashboard", {
+            errorMessage: "An error occurred while fetching payroll records.",
+        });
     }
 });
-
-
-
-
-
 
 
 
@@ -79,12 +81,25 @@ app.get('/login', (req, res) => {
 
 app.get('/profile', async (req, res) => {
     try {
+        if (!req.session.uid) {
+            return res.redirect('/login');
+        }
+
         const userId = req.session.uid;
         const user = await User.findById(userId);
-        res.render('profile', { data: user, loggedIn: req.session.loggedIn, currentPage: 'profile' });
+
+        if (!user) {
+            return res.status(404).render('profile', { errorMessage: 'User not found' });
+        }
+
+        res.render('profile', {
+            data: user,
+            loggedIn: req.session.loggedIn,
+            currentPage: 'profile',
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).render('profile', { errorMessage: 'Internal Server Error' });
     }
 });
 
@@ -124,7 +139,7 @@ app.post('/authenticate', async (req, res) => {
             if (match) {
                 req.session.uid = uId;
                 req.session.loggedIn = true;
-                res.redirect('/home');
+                res.redirect('/dashboard');
             } else {
                 res.render('login', { errorMessage: 'Invalid password' });
             }

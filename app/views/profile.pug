@@ -1,0 +1,75 @@
+doctype html
+html
+  head
+    title User Profile
+    style.
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+      .container {
+        width: 90%;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      .profile-item {
+        margin: 10px 0;
+        padding: 10px 0;
+        border-bottom: 1px solid #ddd;
+      }
+      .profile-item:last-child {
+        border-bottom: none;
+      }
+      .label {
+        font-weight: bold;
+        color: #555;
+      }
+      .value {
+        margin-left: 10px;
+        color: #333;
+      }
+      .logout {
+        display: block;
+        width: 100%;
+        margin: 20px 0;
+        padding: 10px;
+        text-align: center;
+        background-color: #4CAF50;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 1rem;
+      }
+      .logout:hover {
+        background-color: #45a049;
+      }
+      .message {
+        text-align: center;
+        color: #f44336;
+        font-size: 1.2rem;
+      }
+  body
+    include header1
+    .container
+      h1 User Profile
+
+      // Display an error message if it exists
+      if errorMessage
+        p.message= errorMessage
+      else
+        .profile-item
+          span.label ID:
+          span.value= data.id
+        .profile-item
+          span.label Email:
+          span.value= data.email

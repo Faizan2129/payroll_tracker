@@ -54,8 +54,37 @@ html
         font-size: 1.5rem;
         color: #f44336;
       }
-    
+
+      .payroll-table {
+        margin-top: 50px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      table th, table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      table th {
+        background-color: #4CAF50;
+        color: white;
+      }
+
+      table tr:hover {
+        background-color: #f1f1f1;
+      }
+
   body
+    include header1
     .container
       h1 Payroll Dashboard
 
@@ -77,3 +106,35 @@ html
         .card
           h3 Total
           p= total + ' / $' + total
+
+      // Table for payroll records
+      if payroll_records.length
+        .payroll-table
+          table
+            thead
+              tr
+                th ID
+                th User ID
+                th Company
+                th Hours Worked
+                th Hourly Rate
+                th Overtime Hours
+                th Overtime Rate
+                th Total Pay
+                th Work Date
+                th Status
+            tbody
+              each record in payroll_records
+                tr
+                  td= record.id
+                  td= record.user_id
+                  td= record.company
+                  td= record.hours_worked
+                  td= '$' + record.hourly_rate
+                  td= record.overtime_hours
+                  td= record.overtime_rate
+                  td= '$' + record.total_pay
+                  td= new Date(record.work_date).toLocaleDateString()
+                  td= record.status
+      else
+        p.message No payroll records found.
